@@ -37,7 +37,7 @@ def train_model(config_path: Text) -> None:
 
 if __name__ == '__main__':
     args_parser= argparse.ArgumentParser()
-    args_parser.add_argument('--config', dest= 'config', requored= True)
+    args_parser.add_argument('--config', dest= 'config', required= True)
     args= args_parser.parse_args()
 
     train_model(config_path= args.config)

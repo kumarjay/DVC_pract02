@@ -25,4 +25,4 @@ if __name__ == '__main__':
     arg_parser.add_argument('--config', dest= 'config', required= True)
     args= arg_parser.parse_args()
 
-    data_split(conf_path= args.config)
+    data_split(config_path= args.config)

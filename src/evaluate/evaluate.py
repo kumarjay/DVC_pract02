@@ -12,4 +12,6 @@ def evaluate(df= pd.DataFrame, target_column= Text, clf= BaseEstimator) -> Tuple
     cm = confusion_matrix(prediction, y_test)
     f1 = f1_score(y_true=y_test, y_pred=prediction, average='macro')
 
-    return f1, cm
+    return {'f1':f1, 'cm':cm,
+            'actual': y_test,
+            'predicted': prediction}

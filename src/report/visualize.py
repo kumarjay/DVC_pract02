@@ -1,13 +1,15 @@
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml, os
 
 
 def plot_confusion_matrix(cm,
                           target_names,
                           title='Confusion matrix',
                           cmap=None,
-                          normalize=True):
+                          normalize=True,
+                          config= None):
 
 
     accuracy = np.trace(cm) / float(np.sum(cm))
@@ -43,4 +45,9 @@ def plot_confusion_matrix(cm,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+    # config = yaml.safe_load(open(config_path))
+    reports_folder = config['base']['reports']['reports_folder']
+    confusion_matrix_png_path = os.path.join(reports_folder, config['evaluate']['confusion_matrix_png'])
+    # print(confusion_matrix_png_path, plt.shape)
+    plt.savefig(confusion_matrix_png_path)
     plt.show()
