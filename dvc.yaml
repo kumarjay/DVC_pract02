@@ -1,0 +1,45 @@
+stages:
+  data_load:
+    cmd: python -m src.pipelines.data_load --config=params.yaml
+    deps:
+    - src/pipelines/data_load.py
+    params:
+    - base
+    - data_load
+    outs:
+    - data/raw/iris.csv
+  featurize:
+    cmd: python -m src.pipelines.featurize --config=params.yaml
+    deps:
+    - data/raw/iris.csv
+    - src/pipelines/featurize.py
+    params:
+    - base
+    - data_load
+    - featurize
+    outs:
+    - data/processed/featured_iris.csv
+  data_split:
+    cmd: python src/pipelines/data_split.py --config=params.yaml
+    deps:
+    - data/processed/featured_iris.csv
+    - src/pipelines/data_split.py
+    params:
+    - base
+    - data_split
+    - featurize
+    outs:
+    - data/processed/test_iris.csv
+    - data/processed/train_iris.csv
+  train:
+    cmd: python -m src.pipelines.train --config=params.yaml
+    deps:
+    - data/processed/train_iris.csv
+    - src/pipelines/train.py
+    params:
+    - base
+    - data_split.train_path
+    - featurize.target_column
+    - train
+    outs:
+    - models/model.joblib
