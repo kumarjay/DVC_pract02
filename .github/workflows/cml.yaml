@@ -21,7 +21,7 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip install dvc
+          pip install -r requirements.txt
           dvc init
           dvc run -n data_load \
             -d src/pipelines/data_load.py \
@@ -30,7 +30,7 @@ jobs:
             python src/pipelines/data_load.py \
                 --config=params.yaml
 
-          pip install -r requirements.txt
+          
           python src/pipelines/evaluate.py --config=params.yaml
           
           cat reports/metrics.json > report.md
