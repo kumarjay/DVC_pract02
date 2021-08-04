@@ -11,8 +11,8 @@ import yaml
 print(os.getcwd())
 print(os.listdir())
 # export PYTHONPATH="$PYTHONPATH:/mnt"
-# import sys
-# sys.path.insert(0, '/home/jay/PycharmProjects/DVC_pract01')
+import sys
+sys.path.insert(0, '/home/runner/work/DVC_pract02/DVC_pract02')
 
 from src.data.dataset import get_target_names
 from src.evaluate.evaluate import evaluate
