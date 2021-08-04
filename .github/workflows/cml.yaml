@@ -21,6 +21,13 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          dvc run -n data_load \
+            -d src/pipelines/data_load.py \
+            -o data/raw/iris.csv \
+            -p base,data_load \
+            python src/pipelines/data_load.py \
+                --config=params.yaml
+
           pip install -r requirements.txt
           python src/pipelines/evaluate.py --config=params.yaml
           
