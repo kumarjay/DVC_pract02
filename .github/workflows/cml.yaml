@@ -21,6 +21,8 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          pip install dvc
+          dvc init
           dvc run -n data_load \
             -d src/pipelines/data_load.py \
             -o data/raw/iris.csv \
