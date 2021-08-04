@@ -3,6 +3,9 @@ from typing import Text
 import yaml
 import sys, os
 
+import sys
+sys.path.insert(0, '/home/runner/work/DVC_pract02/DVC_pract02')
+
 from src.data.dataset import get_dataset
 
 
