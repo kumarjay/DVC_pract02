@@ -23,7 +23,15 @@ jobs:
         run: |
           pip install -r requirements.txt
           dvc init
+          git add .
+          git commit -m "Init and configure DVC"
+          
           dvc remote add -d local /tmp/dvc/dvc-5-demo-project-iris
+          git add .
+          git commit -m "add dvc remote - local"
+          
+          
+          
           dvc run -n data_load \
             -d src/pipelines/data_load.py \
             -o data/raw/iris.csv \
