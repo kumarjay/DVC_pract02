@@ -73,7 +73,9 @@ jobs:
                   --config=params.yaml
           
           git rm -r --cached 'reports/classess.csv'
-          git commit -m "stop tracking reports/classess.csv"
+          git rm -r --cached 'reports/confusion_matrix.png'
+          git rm -r --cached 'reports/metrics.json'
+          git commit -m "stop tracking catches"
 
 
           dvc run -n evaluate \
