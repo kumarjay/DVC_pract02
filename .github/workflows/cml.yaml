@@ -23,8 +23,7 @@ jobs:
         run: |
           git config --global user.email "kumarjay2107@gmail.com"
           git config --global user.name "kumarjay"
-          git add .
-          git commit -m "hello"
+          
           
           pip install -r requirements.txt
           dvc init
