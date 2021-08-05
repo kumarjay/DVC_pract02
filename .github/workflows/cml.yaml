@@ -29,11 +29,54 @@ jobs:
             -p base,data_load \
             python src/pipelines/data_load.py \
                 --config=params.yaml
+                
+          dvc run -n featurize \
+              -d src/pipelines/featurize.py \
+              -d data/raw/iris.csv \
+              -o data/processed/featured_iris.csv \
+              -p base,data_load,featurize \
+              python src/pipelines/featurize.py \
+                  --config=params.yaml
 
-          
-          python src/pipelines/evaluate.py --config=params.yaml
+
+
+          dvc run -n data_split \
+              -d src/pipelines/data_split.py \
+              -d data/processed/featured_iris.csv \
+              -o data/processed/train_iris.csv \
+              -o data/processed/test_iris.csv \
+              -p base,featurize,data_split \
+              python src/pipelines/data_split.py \
+                  --config=params.yaml
+        
+        
+        
+          dvc run -n train \
+              -d src/pipelines/train.py \
+              -d data/processed/train_iris.csv \
+              -o models/model.joblib \
+              -p base,featurize.target_column,data_split.train_path,train \
+              python src/pipelines/train.py \
+                  --config=params.yaml
+
+
+
+          dvc run -n evaluate \
+              -d src/pipelines/evaluate.py \
+              -d data/processed/test_iris.csv \
+              -d models/model.joblib \
+              -o reports/confusion_matrix.png \
+              -m reports/metrics.json \
+              --plots reports/classess.csv \
+              -p base,featurize.target_column,data_split.test_path,evaluate \
+              python src/pipelines/evaluate.py \
+                  --config=params.yaml
+    
+
+
+        
+
           
           cat reports/metrics.json > report.md
           cml-publish reports/confusion_matrix.png --md >> report.md
-          cml-publish pr_curve.png --md >> report.md
           cml-send-comment report.md
