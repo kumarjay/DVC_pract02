@@ -86,7 +86,8 @@ jobs:
                   --config=params.yaml
     
 
-
+          git rm -r --cached 'reports/classess.csv'
+          git commit -m "stop tracking reports/classess.csv"
         
 
           
