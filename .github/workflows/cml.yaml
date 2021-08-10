@@ -1,0 +1,103 @@
+name: model-training
+on: [push]
+jobs:
+  run:
+    runs-on: [ubuntu-latest]
+    # optionally use a convenient Ubuntu LTS + CUDA + DVC + CML image
+    # container: docker://dvcorg/cml:0-dvc2-base1-gpu
+    # container: docker://ghcr.io/iterative/cml:0-dvc2-base1-gpu
+    steps:
+      - uses: actions/checkout@v2
+      # may need to setup NodeJS & Python3 on e.g. self-hosted
+      # - uses: actions/setup-node@v1
+      #   with:
+      #     node-version: '12'
+      # - uses: actions/setup-python@v2
+      #   with:
+      #     python-version: '3.x'
+      - uses: actions/setup-python@v2
+      - uses: iterative/setup-cml@v1
+      - name: Train model
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          git config --global user.email "kumarjay2107@gmail.com"
+          git config --global user.name "kumarjay"
+          
+          
+          pip install -r requirements.txt
+          pip install 'dvc[s3]'
+          dvc init
+          git add .
+          git commit -m "Init and configure DVC"
+          
+          dvc remote add -d dvc_remote s3://dvc-demo-s3/dvc-git-test/
+          git add .
+          git commit .dvc/config -m "Configure remote storage"
+          dvc push
+          
+          
+          
+          dvc run -n data_load \
+            -d src/pipelines/data_load.py \
+            -o data/raw/iris.csv \
+            -p base,data_load \
+            python src/pipelines/data_load.py \
+                --config=params.yaml
+                
+          dvc run -n featurize \
+              -d src/pipelines/featurize.py \
+              -d data/raw/iris.csv \
+              -o data/processed/featured_iris.csv \
+              -p base,data_load,featurize \
+              python src/pipelines/featurize.py \
+                  --config=params.yaml
+
+
+
+          dvc run -n data_split \
+              -d src/pipelines/data_split.py \
+              -d data/processed/featured_iris.csv \
+              -o data/processed/train_iris.csv \
+              -o data/processed/test_iris.csv \
+              -p base,featurize,data_split \
+              python src/pipelines/data_split.py \
+                  --config=params.yaml
+        
+        
+        
+          dvc run -n train \
+              -d src/pipelines/train.py \
+              -d data/processed/train_iris.csv \
+              -o models/model.joblib \
+              -p base,featurize.target_column,data_split.train_path,train \
+              python src/pipelines/train.py \
+                  --config=params.yaml
+          
+          git rm -r --cached 'reports/classess.csv'
+          git rm -r --cached 'reports/confusion_matrix.png'
+          git commit -m "stop tracking catches"
+
+
+          dvc run -n evaluate \
+              -d src/pipelines/evaluate.py \
+              -d data/processed/test_iris.csv \
+              -d models/model.joblib \
+              -o reports/confusion_matrix.png \
+              -m reports/metrics.json \
+              --plots reports/classess.csv \
+              -p base,featurize.target_column,data_split.test_path,evaluate \
+              python src/pipelines/evaluate.py \
+                  --config=params.yaml
+    
+
+          
+          dvc push
+
+          
+          cat reports/metrics.json > report.md
+          cml-publish reports/confusion_matrix.png --md >> report.md
+          cml-send-comment report.md
