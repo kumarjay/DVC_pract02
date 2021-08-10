@@ -35,7 +35,8 @@ jobs:
           
           dvc remote add -d dvc_remote s3://dvc-demo-s3/dvc-git-test
           git add .
-          git commit -m "add dvc remote - local"
+          git commit .dvc/config -m "Configure remote storage"
+          dvc push
           
           
           
