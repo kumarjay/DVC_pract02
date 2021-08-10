@@ -34,7 +34,7 @@ jobs:
           git add .
           git commit -m "Init and configure DVC"
           
-          dvc remote add -d dvc_remote s3://dvc-demo-s3/dvc-git-test
+          dvc remote add -d dvc_remote s3://dvc-demo-s3/dvc-git-test/
           git add .
           git commit .dvc/config -m "Configure remote storage"
           dvc push
@@ -95,7 +95,7 @@ jobs:
     
 
           
-        
+          dvc push
 
           
           cat reports/metrics.json > report.md
