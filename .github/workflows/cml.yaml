@@ -20,6 +20,9 @@ jobs:
       - name: Train model
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
         run: |
           git config --global user.email "kumarjay2107@gmail.com"
           git config --global user.name "kumarjay"
@@ -30,7 +33,7 @@ jobs:
           git add .
           git commit -m "Init and configure DVC"
           
-          dvc remote add -d local /tmp/dvc/dvc-5-demo-project-iris
+          dvc remote add -d dvc_remote s3://dvc-demo-s3/dvc-git-test
           git add .
           git commit -m "add dvc remote - local"
           
